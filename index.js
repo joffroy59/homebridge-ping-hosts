@@ -10,12 +10,15 @@ module.exports = function (homebridge) {
     Characteristic = homebridge.hap.Characteristic;
 
     homebridge.registerPlatform("@vectronic/homebridge-ping-hosts", "PingHosts", PingHostsPlatform);
+
+    var FakeGatoHistoryService = require('fakegato-history')(homebridge);
 };
 
 
 function PingHostsPlatform(log, config) {
     this.log = log;
     this.hosts = config["hosts"] || [];
+
 }
 
 
@@ -29,9 +32,13 @@ PingHostsPlatform.prototype.accessories = function (callback) {
 };
 
 
+
 function PingHostContactAccessory(log, config, id) {
     this.log = log;
     this.id = id;
+
+    this.fakeGatoHistoryService = this.getFakeGatoHistoryService();
+    this.log.info("[fakeGato] init");
 
     this.name = config["name"];
     if (!this.name) {
@@ -145,6 +152,8 @@ PingHostContactAccessory.prototype.doPing = async function () {
     const target = this.ipv6_address || this.ipv4_address || this.mac_address;
     let resolvedAddress = this.ipv6_address || this.ipv4_address;
 
+    var FakeGatoHistoryService = require('fakegato-history')(homebridge);
+
     try {
         if (this.mac_address) {
             try {
@@ -178,7 +187,7 @@ PingHostContactAccessory.prototype.doPing = async function () {
                 }
             }
         }
-        this.log.debug("[" + this.name + "] success for " + target);
+        this.log.info("[" + this.name + "] success for " + target);
 
         this.state = this.success_state;
         this.characteristic.updateValue(this.state);
@@ -194,3 +203,23 @@ PingHostContactAccessory.prototype.doPing = async function () {
 PingHostContactAccessory.prototype.getServices = function () {
     return [this.services.AccessoryInformation, this.services.sensor];
 };
+
+PingHostContactAccessory.prototype.serialNumber = function () {
+    return this.ipv4_address != null
+        ? this.ipv4_address.replace(/:/g, "")
+        : undefined;
+}
+PingHostContactAccessory.prototype.getFakeGatoHistoryService= function() {
+  /*   if (!this.isFakeGatoEnabled) {
+        return;
+    } */
+    const serialNumber = this.serialNumber();
+    const filename = `fakegato-history_${serialNumber}.json`;
+    // const path = this.fakeGatoStoragePath;
+    const path = '/tmp';
+    return new this.FakeGatoHistoryService("room", this, {
+        filename,
+        path,
+        storage: "fs"
+    });
+}

@@ -19,6 +19,7 @@
 	},
 	"dependencies": {
 		"ping": "0.4.2",
-		"@network-utils/arp-lookup": "2.0.1"
+		"@network-utils/arp-lookup": "2.0.1",
+    "fakegato-history": "^0.6.4"	
 	}
 }
