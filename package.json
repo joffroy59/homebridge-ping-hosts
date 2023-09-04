@@ -18,7 +18,8 @@
 		"url": "git@github.com:vectronic/homebridge-ping-hosts.git"
 	},
 	"dependencies": {
-		"ping": "0.4.2",
-		"@network-utils/arp-lookup": "2.0.1"
+		"@network-utils/arp-lookup": "2.0.1",
+		"fakegato-history": "^0.5.2",
+		"ping": "0.4.2"
 	}
 }

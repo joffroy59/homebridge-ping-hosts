@@ -4,8 +4,11 @@ const ping = require("ping");
 const arp = require('@network-utils/arp-lookup');
 let Service, Characteristic;
 
+let FakeGatoHistoryService;
 
 module.exports = function (homebridge) {
+    FakeGatoHistoryService = require('fakegato-history')(homebridge);
+    
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
 
@@ -138,6 +141,10 @@ function PingHostContactAccessory(log, config, id) {
         });
     }
 
+    this.historyService = new FakeGatoHistoryService('switch', this, {
+        storage: 'fs', 
+    });
+
     setInterval(this.doPing.bind(this), this.ping_interval);
 }
 
@@ -182,6 +189,13 @@ PingHostContactAccessory.prototype.doPing = async function () {
 
         this.state = this.success_state;
         this.characteristic.updateValue(this.state);
+
+        // Enregistrez l'état dans l'historique
+        this.historyService.addEntry({
+            time: Math.floor(Date.now() / 1000), // Horodatage UNIX
+            status: this.state === this.success_state ? 1 : 0, // 1 pour succès, 0 pour échec
+        });
+
     } catch (e1) {
         this.log.debug("[" + this.name + "] response error: " + e1.toString() + " for " + target);
 
@@ -192,5 +206,5 @@ PingHostContactAccessory.prototype.doPing = async function () {
 
 
 PingHostContactAccessory.prototype.getServices = function () {
-    return [this.services.AccessoryInformation, this.services.sensor];
+    return [this.services.AccessoryInformation, this.services.sensor, this.historyService];
 };
