@@ -8,7 +8,7 @@ let FakeGatoHistoryService;
 
 module.exports = function (homebridge) {
     FakeGatoHistoryService = require('fakegato-history')(homebridge);
-    
+
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
 
@@ -78,6 +78,7 @@ function PingHostContactAccessory(log, config, id) {
 
     this.services.AccessoryInformation.setCharacteristic(Characteristic.Manufacturer, "vectronic");
     this.services.AccessoryInformation.setCharacteristic(Characteristic.Model, "Ping State Sensor");
+    this.services.AccessoryInformation.setCharacteristic(Characteristic.SerialNumber, "TODOSN");
 
     if (this.type.toLowerCase() === "contactsensor") {
         if (this.closed_on_success) {
@@ -141,8 +142,13 @@ function PingHostContactAccessory(log, config, id) {
         });
     }
 
+    this.serialNumber = `${this.name}`
+    this.displayName = `PingHostContactAccessory-${this.name}`
+    const filename = `fakegato-history_PingHostContactAccessory-${this.serialNumber}.json`;
     this.historyService = new FakeGatoHistoryService('switch', this, {
+        filename,
         storage: 'fs', 
+        minutes: 1
     });
 
     setInterval(this.doPing.bind(this), this.ping_interval);
