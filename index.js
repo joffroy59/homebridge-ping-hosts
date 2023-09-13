@@ -78,7 +78,7 @@ function PingHostContactAccessory(log, config, id) {
 
     this.services.AccessoryInformation.setCharacteristic(Characteristic.Manufacturer, "vectronic");
     this.services.AccessoryInformation.setCharacteristic(Characteristic.Model, "Ping State Sensor");
-    this.services.AccessoryInformation.setCharacteristic(Characteristic.SerialNumber, "TODOSN");
+    this.services.AccessoryInformation.setCharacteristic(Characteristic.SerialNumber, this.name);
 
     if (this.type.toLowerCase() === "contactsensor") {
         if (this.closed_on_success) {
@@ -145,7 +145,7 @@ function PingHostContactAccessory(log, config, id) {
     this.serialNumber = `${this.name}`
     this.displayName = `PingHostContactAccessory-${this.name}`
     const filename = `fakegato-history_PingHostContactAccessory-${this.serialNumber}.json`;
-    this.historyService = new FakeGatoHistoryService('switch', this, {
+    this.historyService = new FakeGatoHistoryService('door', this, {
         filename,
         storage: 'fs', 
         minutes: 1
@@ -207,6 +207,13 @@ PingHostContactAccessory.prototype.doPing = async function () {
 
         this.state = this.failure_state;
         this.characteristic.updateValue(this.state);
+        
+        // Enregistrez l'état dans l'historique
+
+        this.historyService.addEntry({
+            time: Math.floor(Date.now() / 1000), // Horodatage UNIX
+            status: this.state === this.success_state ? 1 : 0, // 1 pour succès, 0 pour échec
+        });        
     }
 };
 
