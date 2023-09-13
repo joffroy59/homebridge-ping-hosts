@@ -197,6 +197,11 @@ PingHostContactAccessory.prototype.doPing = async function () {
         this.characteristic.updateValue(this.state);
 
         // Enregistrez l'état dans l'historique
+        this.log.debug("[" + this.name + "] historyService addEntry state: " + this.state + " for " + target);
+        this.log.debug("[" + this.name + "] historyService addEntry state success_state: " + this.success_state + " for " + target);
+        this.log.debug("[" + this.name + "] historyService addEntry state failure_state: " + this.failure_state + " for " + target);
+        this.log.debug("[" + this.name + "] historyService addEntry state history: " + (this.state === this.success_state ? 1 : 0) + " for " + target);
+        
         this.historyService.addEntry({
             time: Math.floor(Date.now() / 1000), // Horodatage UNIX
             status: this.state === this.success_state ? 1 : 0, // 1 pour succès, 0 pour échec
@@ -209,6 +214,10 @@ PingHostContactAccessory.prototype.doPing = async function () {
         this.characteristic.updateValue(this.state);
         
         // Enregistrez l'état dans l'historique
+        this.log.debug("[" + this.name + "] historyService addEntry state KO: " + this.state + " for " + target);
+        this.log.debug("[" + this.name + "] historyService addEntry state KO success_state: " + this.success_state + " for " + target);
+        this.log.debug("[" + this.name + "] historyService addEntry state KO failure_state: " + this.failure_state + " for " + target);
+        this.log.debug("[" + this.name + "] historyService addEntry state KO history: " + (this.state === this.success_state ? 1 : 0) + " for " + target);
 
         this.historyService.addEntry({
             time: Math.floor(Date.now() / 1000), // Horodatage UNIX
