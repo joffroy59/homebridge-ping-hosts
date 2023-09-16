@@ -145,7 +145,7 @@ function PingHostContactAccessory(log, config, id) {
     this.serialNumber = `${this.name}`
     this.displayName = `PingHostContactAccessory-${this.name}`
     const filename = `fakegato-history_PingHostContactAccessory-${this.serialNumber}.json`;
-    this.historyService = new FakeGatoHistoryService('door', this, {
+    this.historyService = new FakeGatoHistoryService('switch', this, {
         filename,
         storage: 'fs', 
         minutes: 1
